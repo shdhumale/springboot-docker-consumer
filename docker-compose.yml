@@ -1,0 +1,20 @@
+version: "3"
+services:
+  siddhuconsumer:
+    image: shdhumale/springboot-docker-consumer
+    ports:
+      - "8090:8090"
+    networks:
+      - siddhu-ms-consumer-producer
+    depends_on:
+      - siddhuproducer
+ 
+  siddhuproducer:
+    image: shdhumale/springboot-docker-producer
+    ports:
+      - "8091:8091"
+    networks:
+      - siddhu-ms-consumer-producer 
+
+networks:
+  siddhu-ms-consumer-producer:
