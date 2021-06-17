@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-docker-producer
+  namespace: springboot-application
+spec:
+  selector:
+    matchLabels:
+      component: springboot-docker-producer
+  template:
+    metadata:
+      labels:
+        component: springboot-docker-producer
+    spec:
+      containers:
+      - name: springboot-docker-producer
+        image: shdhumale/springboot-docker-producer:latest
+        env:
+        - name: discovery.type
+          value: single-node
+        ports:
+        - containerPort: 8091
+          name: http
+          protocol: TCP      
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: siddhuproducer
+  namespace: springboot-application
+  labels:
+    service: springboot-docker-producer
+spec:
+  type: NodePort
+  selector:
+    component: springboot-docker-producer
+  ports:
+  - port: 8091
+    targetPort: 8091

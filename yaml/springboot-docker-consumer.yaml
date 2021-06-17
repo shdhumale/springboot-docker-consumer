@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-docker-consumer
+  namespace: springboot-application
+spec:
+  selector:
+    matchLabels:
+      component: springboot-docker-consumer
+  template:
+    metadata:
+      labels:
+        component: springboot-docker-consumer
+    spec:
+      containers:
+      - name: springboot-docker-consumer
+        image: shdhumale/springboot-docker-consumer:latest
+        env:
+        - name: discovery.type
+          value: single-node
+        ports:
+        - containerPort: 8090
+          name: http
+          protocol: TCP      
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: siddhuconsumer
+  namespace: springboot-application
+  labels:
+    service: springboot-docker-consumer
+spec:
+  type: NodePort
+  selector:
+    component: springboot-docker-consumer
+  ports:
+  - port: 8090
+    targetPort: 8090
