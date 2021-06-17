@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.springbootdockerconsumerdeployment.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  selector:
+    matchLabels:
+      component: {{ .Values.springbootdockerconsumerdeployment.name }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.springbootdockerconsumerdeployment.name }}
+    spec:
+      containers:
+      - name: {{ .Values.springbootdockerconsumerdeployment.name }}
+        image: {{ .Values.consumerimage.repository }}:{{ .Values.consumerimage.tag | default .Chart.AppVersion }}
+        env:
+        - name: discovery.type
+          value: single-node
+        ports:
+        - containerPort: {{ .Values.springbootconsumer.port }}
+          name: http
+          protocol: TCP      
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: siddhuconsumer
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    service: {{ .Values.springbootdockerconsumerdeployment.name }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    component: {{ .Values.springbootdockerconsumerdeployment.name }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.targetPort }}

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.springbootdockerproducerdeployment.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  selector:
+    matchLabels:
+      component: {{ .Values.springbootdockerproducerdeployment.name }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.springbootdockerproducerdeployment.name }}
+    spec:
+      containers:
+      - name: springboot-docker-producer
+        image: {{ .Values.producerimage.repository }}:{{ .Values.producerimage.tag | default .Chart.AppVersion }}
+        env:
+        - name: discovery.type
+          value: single-node
+        ports:
+        - containerPort: {{ .Values.springbootproducer.port }}
+          name: http
+          protocol: TCP      
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: siddhuproducer
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    service: {{ .Values.springbootdockerproducerdeployment.name }}
+spec:
+  type: NodePort
+  selector:
+    component: {{ .Values.springbootdockerproducerdeployment.name }}
+  ports:
+  - port: {{ .Values.producerservice.port }}
+    targetPort: {{ .Values.producerservice.targetPort }}
